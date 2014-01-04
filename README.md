@@ -14,6 +14,16 @@ Documentation provided by GoDoc.
 
 [tileset]: http://godoc.org/github.com/mewmew/pgg/tileset
 
+Command documentation
+---------------------
+
+Command documentation provided by GoDoc.
+
+   - cmd
+      - [tiledump][]: extracts tile images contained within tile sets.
+
+[tiledump]: http://godoc.org/github.com/mewmew/pgg/cmd/tiledump
+
 public domain
 -------------
 
