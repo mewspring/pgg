@@ -75,6 +75,7 @@ func (ts *TileSet) Tile(id TileID) image.Image {
 // LastID returns the last tile identifier contained within the tile set. An
 // empty tile set always returns the zero value.
 func (ts *TileSet) LastID() (id TileID) {
+	// TODO(u): ignore trailing empty tiles?
 	tsCols := ts.width / ts.TileWidth
 	tsRows := ts.height / ts.TileHeight
 	id = TileID(tsCols * tsRows)
