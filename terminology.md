@@ -7,6 +7,7 @@ maps
 tiles
 -----
 
+* https://en.wikipedia.org/wiki/Grid_%28spatial_index%29
 * https://en.wikipedia.org/wiki/Tessellation
 
 	"A tessellation is the tiling of a plane using one or more geometric shapes,
