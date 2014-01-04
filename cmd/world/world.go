@@ -43,8 +43,10 @@ func world() (err error) {
 
 	// Initialize camera.
 	cam := view.Camera{
-		Cols: 7,
-		Rows: 7,
+		TopLeft: grid.Loc(1, 1),
+		Cols:    7,
+		Rows:    7,
+		Offset:  image.Pt(16, 16),
 	}
 
 	// Initialize tileset.
@@ -63,13 +65,14 @@ func world() (err error) {
 	draw.Draw(world, world.Bounds(), lime, image.ZP, draw.Over)
 
 	// Draw loop.
-	// TODO(u): implement handling of cam.TopLeft and cam.Offset.
 	for col := 0; col < cam.Cols; col++ {
 		for row := 0; row < cam.Rows; row++ {
-			id := tileset.TileID(m[col][row])
+			camCol := col + cam.TopLeft.Col
+			camRow := row + cam.TopLeft.Row
+			id := tileset.TileID(m[camCol][camRow])
 			tile := ts.Tile(id)
-			xmin := col*TileWidth + cam.Offset.X
-			ymin := row*TileHeight + cam.Offset.Y
+			xmin := col*TileWidth - cam.Offset.X
+			ymin := row*TileHeight - cam.Offset.Y
 			dr := image.Rect(xmin, ymin, xmin+TileWidth, ymin+TileHeight)
 			sp := tile.Bounds().Min
 			draw.Draw(world, dr, tile, sp, draw.Over)
