@@ -34,6 +34,7 @@ Command documentation provided by GoDoc.
       - [world][]: initializes and renders a simple game world.
 
 [tiledump]: http://godoc.org/github.com/mewmew/pgg/cmd/tiledump
+[world]: http://godoc.org/github.com/mewmew/pgg/cmd/world
 
 public domain
 -------------
