@@ -7,25 +7,24 @@ import (
 	"github.com/mewkiz/pkg/imgutil"
 )
 
-// A TileSet is a collection of one or more tile images.
+// A TileSet is a collection of one or more tile images, all of which have the
+// same width and height.
 type TileSet struct {
 	// Tileset sprite sheet.
 	imgutil.SubImager
-	// Tileset width.
-	width int
-	// Tileset height.
-	height int
 	// Tile width.
-	tileWidth int
+	TileWidth int
 	// Tile height.
-	tileHeight int
+	TileHeight int
+	// Tileset width and height.
+	width, height int
 }
 
 // New returns a tile set based on the provided sprite sheet img.
 func New(img image.Image, tileWidth, tileHeight int) (ts *TileSet) {
 	ts = &TileSet{
-		tileWidth:  tileWidth,
-		tileHeight: tileHeight,
+		TileWidth:  tileWidth,
+		TileHeight: tileHeight,
 	}
 	ts.SubImager = imgutil.SubFallback(img)
 	bounds := ts.Bounds()
@@ -35,7 +34,7 @@ func New(img image.Image, tileWidth, tileHeight int) (ts *TileSet) {
 }
 
 // Open opens the sprite sheet specified by imgPath and returns a tile set based
-// on it.
+// upon it.
 func Open(imgPath string, tileWidth, tileHeight int) (ts *TileSet, err error) {
 	img, err := imgutil.ReadFile(imgPath)
 	if err != nil {
@@ -45,8 +44,8 @@ func Open(imgPath string, tileWidth, tileHeight int) (ts *TileSet, err error) {
 	return ts, nil
 }
 
-// A TileID uniquely identifies a tile image. The zero value represents no tile
-// image.
+// A TileID uniquely identifies a tile image in a specific tile set. The zero
+// value represents no tile image.
 type TileID int
 
 // IsValid returns true if the tile identifier is valid and false if it's the
@@ -58,13 +57,13 @@ func (id TileID) IsValid() bool {
 // tileRect returns the bounding rectangle in the sprite sheet of the tile image
 // specified by id.
 func (ts *TileSet) tileRect(id TileID) image.Rectangle {
-	tsCols := ts.width / ts.tileWidth
+	tsCols := ts.width / ts.TileWidth
 	i := int(id - 1)
 	col := i % tsCols
 	row := i / tsCols
-	x := col * ts.tileWidth
-	y := row * ts.tileHeight
-	return image.Rect(x, y, x+ts.tileWidth, y+ts.tileHeight)
+	x := col * ts.TileWidth
+	y := row * ts.TileHeight
+	return image.Rect(x, y, x+ts.TileWidth, y+ts.TileHeight)
 }
 
 // Tile returns the tile image specified by id from the tile set.
@@ -73,10 +72,11 @@ func (ts *TileSet) Tile(id TileID) image.Image {
 	return ts.SubImage(rect)
 }
 
-// LastID returns the last tile ID contained within the tile set.
+// LastID returns the last tile identifier contained within the tile set. An
+// empty tile set always returns the zero value.
 func (ts *TileSet) LastID() (id TileID) {
-	tsCols := ts.width / ts.tileWidth
-	tsRows := ts.height / ts.tileHeight
+	tsCols := ts.width / ts.TileWidth
+	tsRows := ts.height / ts.TileHeight
 	id = TileID(tsCols * tsRows)
 	return id
 }
