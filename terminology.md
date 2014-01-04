@@ -4,7 +4,7 @@ maps
 * http://www.macmillandictionary.com/thesaurus-category/british/Maps-using-maps-and-map-making
 * https://www.lib.utexas.edu/maps/glossary.html
 
-tiles
+grids
 -----
 
 * https://en.wikipedia.org/wiki/Grid_%28spatial_index%29
