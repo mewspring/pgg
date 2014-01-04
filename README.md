@@ -16,9 +16,13 @@ Documentation
 
 Documentation provided by GoDoc.
 
+   - [grid][]: divides the game world into a series of contiguous grid cells.
    - [tileset][]: handles collections of one or more tile images.
+   - [view][]: supervises the visible portion of the screen.
 
+[grid]: http://godoc.org/github.com/mewmew/pgg/grid
 [tileset]: http://godoc.org/github.com/mewmew/pgg/tileset
+[view]: http://godoc.org/github.com/mewmew/pgg/view
 
 Command documentation
 ---------------------
@@ -27,6 +31,7 @@ Command documentation provided by GoDoc.
 
    - cmd
       - [tiledump][]: extracts tile images contained within tile sets.
+      - [world][]: initializes and renders a simple game world.
 
 [tiledump]: http://godoc.org/github.com/mewmew/pgg/cmd/tiledump
 

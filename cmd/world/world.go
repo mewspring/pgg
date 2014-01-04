@@ -1,3 +1,4 @@
+// world is a tool which initializes and renders a simple game world.
 package main
 
 import (
