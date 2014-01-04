@@ -49,6 +49,12 @@ func Open(imgPath string, tileWidth, tileHeight int) (ts *TileSet, err error) {
 // image.
 type TileID int
 
+// IsValid returns true if the tile identifier is valid and false if it's the
+// zero value.
+func (id TileID) IsValid() bool {
+	return id != 0
+}
+
 // tileRect returns the bounding rectangle in the sprite sheet of the tile image
 // specified by id.
 func (ts *TileSet) tileRect(id TileID) image.Rectangle {
@@ -67,9 +73,10 @@ func (ts *TileSet) Tile(id TileID) image.Image {
 	return ts.SubImage(rect)
 }
 
-// TileCount returns the number of tiles contained within the tile set.
-func (ts *TileSet) TileCount() int {
+// LastID returns the last tile ID contained within the tile set.
+func (ts *TileSet) LastID() (id TileID) {
 	tsCols := ts.width / ts.tileWidth
 	tsRows := ts.height / ts.tileHeight
-	return tsCols * tsRows
+	id = TileID(tsCols * tsRows)
+	return id
 }
