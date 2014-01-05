@@ -1,46 +1,34 @@
-// Package tileset handles collections of one or more tile images.
+// Package tileset handles collections of one or more tile images using OpenGL.
 package tileset
 
 import (
 	"image"
 
-	"github.com/mewkiz/pkg/imgutil"
+	"github.com/mewmew/win"
 )
 
 // A TileSet is a collection of one or more tile images, all of which have the
 // same width and height.
 type TileSet struct {
 	// Tileset sprite sheet.
-	imgutil.SubImager
+	img *win.Image
 	// Tile width.
 	TileWidth int
 	// Tile height.
 	TileHeight int
-	// Tileset width and height.
-	width, height int
-}
-
-// New returns a tile set based on the provided sprite sheet img.
-func New(img image.Image, tileWidth, tileHeight int) (ts *TileSet) {
-	ts = &TileSet{
-		TileWidth:  tileWidth,
-		TileHeight: tileHeight,
-	}
-	ts.SubImager = imgutil.SubFallback(img)
-	bounds := ts.Bounds()
-	ts.width = bounds.Dx()
-	ts.height = bounds.Dy()
-	return ts
 }
 
 // Open opens the sprite sheet specified by imgPath and returns a tile set based
 // upon it.
 func Open(imgPath string, tileWidth, tileHeight int) (ts *TileSet, err error) {
-	img, err := imgutil.ReadFile(imgPath)
+	ts = &TileSet{
+		TileWidth:  tileWidth,
+		TileHeight: tileHeight,
+	}
+	ts.img, err = win.OpenImage(imgPath)
 	if err != nil {
 		return nil, err
 	}
-	ts = New(img, tileWidth, tileHeight)
 	return ts, nil
 }
 
@@ -54,30 +42,31 @@ func (id TileID) IsValid() bool {
 	return id != 0
 }
 
-// tileRect returns the bounding rectangle of the tile image in the sprite
-// sheet.
-func (ts *TileSet) tileRect(id TileID) image.Rectangle {
-	tsCols := ts.width / ts.TileWidth
+// tilePoint returns the top left point of the tile image in the tile set.
+func (ts *TileSet) tilePoint(id TileID) image.Point {
+	tsCols := ts.img.Width / ts.TileWidth
 	i := int(id - 1)
 	col := i % tsCols
 	row := i / tsCols
 	x := col * ts.TileWidth
 	y := row * ts.TileHeight
-	return image.Rect(x, y, x+ts.TileWidth, y+ts.TileHeight)
+	return image.Pt(x, y)
 }
 
-// Tile returns the tile image specified by id from the tile set.
-func (ts *TileSet) Tile(id TileID) image.Image {
-	rect := ts.tileRect(id)
-	return ts.SubImage(rect)
+// DrawTile draws the tile image specified by id at the provided destination
+// point dp.
+func (ts *TileSet) DrawTile(id TileID, dp image.Point) {
+	dr := image.Rect(dp.X, dp.Y, dp.X+ts.TileWidth, dp.Y+ts.TileHeight)
+	sp := ts.tilePoint(id)
+	ts.img.DrawRect(dr, sp)
 }
 
 // LastID returns the last tile identifier contained within the tile set. An
 // empty tile set always returns the zero value.
 func (ts *TileSet) LastID() (id TileID) {
 	// TODO(u): ignore trailing empty tiles?
-	tsCols := ts.width / ts.TileWidth
-	tsRows := ts.height / ts.TileHeight
+	tsCols := ts.img.Width / ts.TileWidth
+	tsRows := ts.img.Height / ts.TileHeight
 	id = TileID(tsCols * tsRows)
 	return id
 }
