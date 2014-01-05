@@ -12,4 +12,5 @@ grids
 
 	"A tessellation is the tiling of a plane using one or more geometric shapes,
 	called tiles, with no overlaps and no gaps."
+
 	"Regular tessellation: with tiles all of the same shape"
