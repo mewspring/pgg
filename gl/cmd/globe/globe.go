@@ -1,15 +1,18 @@
-// world is a tool which initializes and renders a simple game world.
+// globe is a tool which initializes and renders a simple game world using
+// OpenGL.
 package main
 
 import (
 	"image"
-	"image/draw"
 	"log"
+	"runtime"
+	"time"
 
-	"github.com/mewkiz/pkg/imgutil"
+	"github.com/mewmew/pgg/gl/tileset"
 	"github.com/mewmew/pgg/grid"
-	"github.com/mewmew/pgg/tileset"
 	"github.com/mewmew/pgg/view"
+	"github.com/mewmew/we"
+	"github.com/mewmew/win"
 )
 
 func init() {
@@ -19,7 +22,7 @@ func init() {
 }
 
 func main() {
-	err := world()
+	err := globe()
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -39,8 +42,15 @@ const (
 	Gravel tileset.TileID = 4
 )
 
-// world initializes and renders the game world.
-func world() (err error) {
+// fps corresponds to the number of frames per second that should be drawn.
+const fps = 60
+
+// globe initializes and renders the game world.
+func globe() (err error) {
+	// OpenGL requires a dedicated OS thread.
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+
 	// Initialize map.
 	m := grid.NewMap(MapCols, MapRows)
 	initLevel(m)
@@ -55,8 +65,17 @@ func world() (err error) {
 	end := image.Pt(mapWidth, mapHeight)
 	v := view.NewView(width, height, end)
 
-	// Initialize world image.
-	world := image.NewRGBA(image.Rect(0, 0, width, height))
+	// Initialize window.
+	err = win.Open(width, height)
+	if err != nil {
+		return err
+	}
+	defer win.Close()
+
+	// Register that we are interested in receiving the following events.
+	win.EnableCloseChan()
+	win.EnableKeyPressChan()
+	win.EnableKeyRepeatChan()
 
 	// Initialize tileset.
 	tileWidth := grid.CellWidth
@@ -68,31 +87,57 @@ func world() (err error) {
 
 	// drawTile draws the tile at the specified column and row.
 	drawTile := func(col, row int) {
-		x := col*grid.CellWidth - v.X()
-		y := row*grid.CellHeight - v.Y()
-		dr := image.Rect(x, y, x+tileWidth, y+tileHeight)
 		viewCol := col + v.Col()
 		viewRow := row + v.Row()
 		id := tileset.TileID(m[viewCol][viewRow])
-		tile := ts.Tile(id)
-		sp := tile.Bounds().Min
-		draw.Draw(world, dr, tile, sp, draw.Over)
+		x := col*grid.CellWidth - v.X()
+		y := row*grid.CellHeight - v.Y()
+		dp := image.Pt(x, y)
+		ts.DrawTile(id, dp)
 	}
 
-	// Draw loop.
-	for col := 0; col < v.Cols(); col++ {
-		for row := 0; row < v.Rows(); row++ {
-			drawTile(col, row)
+	c := time.Tick(time.Second / fps)
+	for {
+		// Draw loop.
+		for col := 0; col < v.Cols(); col++ {
+			for row := 0; row < v.Rows(); row++ {
+				drawTile(col, row)
+			}
 		}
-	}
 
-	// Output world image.
-	err = imgutil.WriteFile("world.png", world)
-	if err != nil {
-		return err
-	}
+		// Swap buffers to display all drawings since last screen update.
+		win.SwapBuffers()
 
-	return nil
+		select {
+		case <-win.CloseChan:
+			// handle close events.
+			return nil
+		case e := <-win.KeyPressChan:
+			handleKeyPress(e, v)
+		case e := <-win.KeyRepeatChan:
+			handleKeyPress(we.KeyPress(e), v)
+		case <-c:
+			// very simple implementation to update 60 times per second.
+			continue
+		}
+		// Keep the frame rate constant.
+		<-c
+	}
+}
+
+// handleKeyPress handles key press events.
+func handleKeyPress(e we.KeyPress, v *view.View) {
+	// handle key press events.
+	switch e.Key {
+	case we.KeyUp:
+		v.Move(image.Pt(0, -2))
+	case we.KeyDown:
+		v.Move(image.Pt(0, 2))
+	case we.KeyRight:
+		v.Move(image.Pt(2, 0))
+	case we.KeyLeft:
+		v.Move(image.Pt(-2, 0))
+	}
 }
 
 // initLevel initializes the provided map with the tiles of a simple level.
