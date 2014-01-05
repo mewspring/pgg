@@ -54,8 +54,8 @@ func (id TileID) IsValid() bool {
 	return id != 0
 }
 
-// tileRect returns the bounding rectangle in the sprite sheet of the tile image
-// specified by id.
+// tileRect returns the bounding rectangle of the tile image in the sprite
+// sheet.
 func (ts *TileSet) tileRect(id TileID) image.Rectangle {
 	tsCols := ts.width / ts.TileWidth
 	i := int(id - 1)
