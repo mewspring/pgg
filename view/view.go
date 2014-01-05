@@ -29,7 +29,7 @@ func NewView(width, height int, end image.Point) (v *View) {
 		Height: height,
 		cols:   width / grid.CellWidth,
 		rows:   height / grid.CellHeight,
-		max:    end.Sub(image.Pt(width, height)),
+		max:    end.Sub(image.Pt(width+1, height+1)),
 	}
 	return v
 }
@@ -55,36 +55,34 @@ func (v *View) Move(delta image.Point) {
 	v.off = off
 }
 
-// ColFirst returns the top left column visible through the view.
-func (v *View) ColFirst() int {
+// Col returns the top left column visible through the view.
+func (v *View) Col() int {
 	return v.off.X / grid.CellWidth
 }
 
-// RowFirst returns the top left row visible through the view.
-func (v *View) RowFirst() int {
+// Row returns the top left row visible through the view.
+func (v *View) Row() int {
 	return v.off.Y / grid.CellHeight
 }
 
-// ColLast returns the bottom right column visible through the view.
-func (v *View) ColLast() int {
-	cols := v.cols
+// Cols returns the number of columns visible through the view.
+func (v *View) Cols() int {
 	if v.off.X != 0 {
 		// TODO(u): verify that views with a width of `n*grid.CellWidth + r`
 		// don't cause an index overflow in the draw loop logic.
-		cols++
+		return v.cols + 1
 	}
-	return v.ColFirst() + cols
+	return v.cols
 }
 
-// RowLast returns the bottom right row visible through the view.
-func (v *View) RowLast() int {
-	rows := v.rows
+// Rows returns the number of rows visible through the view.
+func (v *View) Rows() int {
 	if v.off.Y != 0 {
 		// TODO(u): verify that views with a height of `n*grid.CellHeight + r`
 		// don't cause an index overflow in the draw loop logic.
-		rows++
+		return v.rows + 1
 	}
-	return v.RowFirst() + rows
+	return v.rows
 }
 
 // X returns the x offset to the grid columns visible through the view.
