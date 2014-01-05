@@ -10,14 +10,16 @@ import (
 // A TileSet is a collection of one or more tile images, all of which have the
 // same width and height.
 type TileSet struct {
-	// Tileset sprite sheet.
+	// Tile set sprite sheet.
 	imgutil.SubImager
 	// Tile width.
 	TileWidth int
 	// Tile height.
 	TileHeight int
-	// Tileset width and height.
+	// Tile set width and height.
 	width, height int
+	// Mapping from tile identifiers to tile images.
+	tiles map[TileID]image.Image
 }
 
 // New returns a tile set based on the provided sprite sheet img.
@@ -25,6 +27,7 @@ func New(img image.Image, tileWidth, tileHeight int) (ts *TileSet) {
 	ts = &TileSet{
 		TileWidth:  tileWidth,
 		TileHeight: tileHeight,
+		tiles:      make(map[TileID]image.Image),
 	}
 	ts.SubImager = imgutil.SubFallback(img)
 	bounds := ts.Bounds()
@@ -68,8 +71,14 @@ func (ts *TileSet) tileRect(id TileID) image.Rectangle {
 
 // Tile returns the tile image specified by id from the tile set.
 func (ts *TileSet) Tile(id TileID) image.Image {
-	rect := ts.tileRect(id)
-	return ts.SubImage(rect)
+	tile, ok := ts.tiles[id]
+	if !ok {
+		// Create the tile image as a subimage of the sprite sheet.
+		rect := ts.tileRect(id)
+		tile = ts.SubImage(rect)
+		ts.tiles[id] = tile
+	}
+	return tile
 }
 
 // LastID returns the last tile identifier contained within the tile set. An

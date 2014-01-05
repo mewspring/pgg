@@ -10,7 +10,7 @@ import (
 // A TileSet is a collection of one or more tile images, all of which have the
 // same width and height.
 type TileSet struct {
-	// Tileset sprite sheet.
+	// Tile set sprite sheet.
 	img *win.Image
 	// Tile width.
 	TileWidth int
