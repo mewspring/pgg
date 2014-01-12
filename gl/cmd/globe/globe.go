@@ -8,11 +8,11 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/mewmew/glfw/win"
 	"github.com/mewmew/pgg/gl/tileset"
 	"github.com/mewmew/pgg/grid"
 	"github.com/mewmew/pgg/view"
 	"github.com/mewmew/we"
-	"github.com/mewmew/win"
 )
 
 func init() {

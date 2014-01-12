@@ -4,7 +4,7 @@ package tileset
 import (
 	"image"
 
-	"github.com/mewmew/win"
+	"github.com/mewmew/glfw/win"
 )
 
 // A TileSet is a collection of one or more tile images, all of which have the
